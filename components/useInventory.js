@@ -107,6 +107,11 @@ export const useInventory = () => {
     setItemCategory('');
   };
 
+  const getUniqueCategories = () => {
+    const uniqueCategories = new Set(inventory.map(item => item.category));
+    return Array.from(uniqueCategories).sort();
+  };
+
   return {
     inventory,
     loading,
@@ -115,7 +120,7 @@ export const useInventory = () => {
     itemQuantity,
     itemCategory,
     editingItem,
-    categories,
+    categories: getUniqueCategories(),
     handleOpen,
     handleClose,
     handleAddItem,

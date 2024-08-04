@@ -29,6 +29,10 @@ const InventoryList = ({
     );
   }
 
+  if (inventory.length === 0) {
+    return <Typography>No items in this category.</Typography>;
+  }
+
   return (
     <List sx={{ width: '100%' }}>
       {inventory.map(({ id, name, quantity, category }) => (

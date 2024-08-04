@@ -21,6 +21,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import EditIcon from '@mui/icons-material/Edit';
+import UploadIcon from '@mui/icons-material/Upload';
 import { firestore } from '../app/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { addItem, removeItem, updateItem } from '../utils/itemController';
@@ -103,11 +104,26 @@ export default function Dashboard() {
         color="primary"
         startIcon={<AddIcon />}
         onClick={() => handleOpen()}
-        sx={{ mb: 3 }}
+        sx={{ 
+          mb: { xs: 2, sm: 3 }, 
+          mr: { xs: 0, sm: 2 },
+          width: { xs: '100%', sm: 'auto' }
+        }}
       >
         Add New Item
       </Button>
-
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={<UploadIcon />}
+        onClick={() => handleOpen()}
+        sx={{ 
+          mb: { xs: 2, sm: 3 },
+          width: { xs: '100%', sm: 'auto' }
+        }}
+      >
+        Upload photo
+      </Button>
       {loading ? (
         <Box display="flex" justifyContent="center">
           <CircularProgress />

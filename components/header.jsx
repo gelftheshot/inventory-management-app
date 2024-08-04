@@ -49,7 +49,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function Header() {
+const Header = () => {
   return (
     <>
       <AppBar position="fixed">
@@ -76,4 +76,6 @@ export default function Header() {
       <Toolbar />
     </>
   );
-}
+};
+
+export default Header;

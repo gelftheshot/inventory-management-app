@@ -1,188 +1,60 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Divider,
-  CircularProgress,
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import EditIcon from '@mui/icons-material/Edit';
-import UploadIcon from '@mui/icons-material/Upload';
-import { firestore } from '../app/firebase';
-import { collection, getDocs } from 'firebase/firestore';
-import { addItem, removeItem, updateItem } from '../utils/itemController';
+import React from 'react';
+import { Box, Typography } from '@mui/material';
+import InventoryList from './inventorylist';
+import AddItemButton from './additembutton';
+import UploadPhotoButton from './uploadphotobutton';
+import AddEditItemDialog from './addedititemdialog';
+import { useInventory } from './useInventory';
 
-export default function Dashboard() {
-  const [inventory, setInventory] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [itemName, setItemName] = useState('');
-  const [itemQuantity, setItemQuantity] = useState('');
-  const [editingItem, setEditingItem] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const updateInventory = async () => {
-    setLoading(true);
-    const snapshot = await getDocs(collection(firestore, 'inventory'));
-    const inventoryList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    setInventory(inventoryList);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    updateInventory();
-  }, []);
-
-  const handleAddItem = async () => {
-    if (itemName && itemQuantity) {
-      const quantity = Math.max(0, parseInt(itemQuantity, 10) || 0);
-      await addItem({ name: itemName.trim(), quantity });
-      await updateInventory();
-      handleClose();
-    }
-  };
-
-  const handleEditItem = async () => {
-    if (editingItem && itemName && itemQuantity) {
-      const quantity = Math.max(0, parseInt(itemQuantity, 10) || 0);
-      await updateItem(editingItem.name, { name: itemName.trim(), quantity });
-      await updateInventory();
-      handleClose();
-    }
-  };
-
-  const handleRemoveItem = async (name) => {
-    await removeItem(name);
-    await updateInventory();
-  };
-
-  const handleIncreaseQuantity = async (name, currentQuantity) => {
-    await updateItem(name, { name, quantity: currentQuantity + 1 });
-    await updateInventory();
-  };
-
-  const handleOpen = (item = null) => {
-    if (item) {
-      setEditingItem(item);
-      setItemName(item.name || '');
-      setItemQuantity(item.quantity ? item.quantity.toString() : '');
-    } else {
-      setEditingItem(null);
-      setItemName('');
-      setItemQuantity('');
-    }
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setEditingItem(null);
-    setItemName('');
-    setItemQuantity('');
-  };
+const Dashboard = () => {
+  const {
+    inventory,
+    loading,
+    open,
+    itemName,
+    itemQuantity,
+    editingItem,
+    handleOpen,
+    handleClose,
+    handleAddItem,
+    handleEditItem,
+    handleRemoveItem,
+    handleIncreaseQuantity,
+    setItemName,
+    setItemQuantity,
+  } = useInventory();
 
   return (
     <Box sx={{ width: '100%', minHeight: '100vh', padding: 4 }}>
       <Typography variant="h3" color="primary" gutterBottom>
         Inventory Management
       </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        startIcon={<AddIcon />}
-        onClick={() => handleOpen()}
-        sx={{ 
-          mb: { xs: 2, sm: 3 }, 
-          mr: { xs: 0, sm: 2 },
-          width: { xs: '100%', sm: 'auto' }
-        }}
-      >
-        Add New Item
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        startIcon={<UploadIcon />}
-        onClick={() => handleOpen()}
-        sx={{ 
-          mb: { xs: 2, sm: 3 },
-          width: { xs: '100%', sm: 'auto' }
-        }}
-      >
-        Upload photo
-      </Button>
-      {loading ? (
-        <Box display="flex" justifyContent="center">
-          <CircularProgress />
-        </Box>
-      ) : (
-        <List sx={{ width: '100%' }}>
-          {inventory.map(({ id, name, quantity }) => (
-            <React.Fragment key={id}>
-              <ListItem>
-                <ListItemText
-                  primary={name ? name.charAt(0).toUpperCase() + name.slice(1) : 'Unnamed Item'}
-                  secondary={`Quantity: ${quantity || 0}`}
-                />
-                <ListItemSecondaryAction>
-                  <IconButton edge="end" aria-label="increase" onClick={() => handleIncreaseQuantity(name, quantity)}>
-                    <AddIcon />
-                  </IconButton>
-                  <IconButton edge="end" aria-label="edit" onClick={() => handleOpen({ id, name, quantity })}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton edge="end" aria-label="remove" onClick={() => handleRemoveItem(name)}>
-                    <RemoveIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-              <Divider />
-            </React.Fragment>
-          ))}
-        </List>
-      )}
-
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{editingItem ? 'Edit Item' : 'Add New Item'}</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Item Name"
-            type="text"
-            fullWidth
-            value={itemName}
-            onChange={(e) => setItemName(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Quantity"
-            type="number"
-            fullWidth
-            value={itemQuantity}
-            onChange={(e) => setItemQuantity(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={editingItem ? handleEditItem : handleAddItem} color="primary">
-            {editingItem ? 'Update' : 'Add'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
+        <AddItemButton handleOpen={handleOpen} />
+        <UploadPhotoButton />
+      </Box>
+      <InventoryList
+        inventory={inventory}
+        loading={loading}
+        handleIncreaseQuantity={handleIncreaseQuantity}
+        handleOpen={handleOpen}
+        handleRemoveItem={handleRemoveItem}
+      />
+      <AddEditItemDialog
+        open={open}
+        editingItem={editingItem}
+        itemName={itemName}
+        itemQuantity={itemQuantity}
+        handleClose={handleClose}
+        handleAddItem={handleAddItem}
+        handleEditItem={handleEditItem}
+        setItemName={setItemName}
+        setItemQuantity={setItemQuantity}
+      />
     </Box>
   );
-}
+};
+
+export default Dashboard;

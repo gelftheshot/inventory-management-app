@@ -2,15 +2,7 @@ import { NextResponse } from 'next/server';
 import formidable from 'formidable';
 import fs from 'fs/promises';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-
-const categories = [
-  'Electronics', 'Clothing', 'Food', 'Beverages', 'Furniture', 'Kitchen Appliances',
-  'Home Decor', 'Books', 'Toys', 'Sports Equipment', 'Tools', 'Gardening',
-  'Automotive', 'Health and Beauty', 'Cleaning Supplies', 'Office Supplies',
-  'Pet Supplies', 'Jewelry', 'Art Supplies', 'Music Instruments', 'Outdoor Equipment',
-  'Luggage', 'Crafts', 'Baby Items', 'Medications', 'Party Supplies',
-  'Seasonal Decorations', 'Stationery', 'Collectibles', 'Other'
-];
+import { predefinedCategories } from '../../../utils/categories';
 
 export async function POST(request) {
   try {
@@ -39,9 +31,9 @@ export async function POST(request) {
       },
     ];
 
-    // Send the image to Gemini with a custom prompt
+    // Send the image to Gemini with a custom prompt using predefined categories
     const result = await model.generateContent([
-      `Identify the main item in this image and categorize it into one of the following categories: ${categories.join(', ')}. 
+      `Identify the main item in this image and categorize it into one of the following categories: ${predefinedCategories.join(', ')}. 
       Respond in the following format:
       Item: [item name]
       Category: [category]

@@ -7,8 +7,9 @@ import AddItemButton from './additembutton';
 import UploadPhotoButton from './uploadphotobutton';
 import AddEditItemDialog from './addedititemdialog';
 import { useInventory } from './useInventory';
+import Sidebar from './sidebar';
 
-const Dashboard = () => {
+const Dashboard = ({ selectedCategory }) => {
   const {
     inventory,
     loading,
@@ -30,11 +31,9 @@ const Dashboard = () => {
     updateInventory,
   } = useInventory();
 
-  const [selectedCategory, setSelectedCategory] = useState('All');
-
   const filteredInventory = selectedCategory === 'All' 
     ? inventory 
-    : inventory.filter(item => item.category === selectedCategory);
+    : Object.fromEntries(Object.entries(inventory).filter(([_, item]) => item.category === selectedCategory));
 
   return (
     <Box sx={{ display: 'flex', bgcolor: 'background.default', minHeight: '100vh' }}>

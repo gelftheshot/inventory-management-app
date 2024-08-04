@@ -1,95 +1,52 @@
-import { useState, useEffect } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { useState, useEffect, useCallback } from 'react';
+import { collection, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore';
 import { firestore } from '../app/firebase';
-import { addItem, removeItem, updateItem } from '../utils/itemController';
 
-export const useInventory = () => {
-  const [inventory, setInventory] = useState([]);
+export function useInventory() {
+  const [inventory, setInventory] = useState({});
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [itemName, setItemName] = useState('');
   const [itemQuantity, setItemQuantity] = useState('');
   const [itemCategory, setItemCategory] = useState('');
   const [editingItem, setEditingItem] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState([
-    'Electronics',
-    'Clothing',
-    'Food',
-    'Beverages',
-    'Furniture',
-    'Kitchen Appliances',
-    'Home Decor',
-    'Books',
-    'Toys',
-    'Sports Equipment',
-    'Tools',
-    'Gardening',
-    'Automotive',
-    'Health and Beauty',
-    'Cleaning Supplies',
-    'Office Supplies',
-    'Pet Supplies',
-    'Jewelry',
-    'Art Supplies',
-    'Music Instruments',
-    'Outdoor Equipment',
-    'Luggage',
-    'Crafts',
-    'Baby Items',
-    'Medications',
-    'Party Supplies',
-    'Seasonal Decorations',
-    'Stationery',
-    'Collectibles',
-    'Other'
-  ]);
+  const [categories, setCategories] = useState([]);
 
-  const updateInventory = async () => {
+  const updateInventory = useCallback(async () => {
     setLoading(true);
-    const snapshot = await getDocs(collection(firestore, 'inventory'));
-    const inventoryList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    setInventory(inventoryList);
-    setLoading(false);
-  };
+    try {
+      const snapshot = await getDocs(collection(firestore, 'inventory'));
+      const inventoryData = {};
+      const categoriesSet = new Set();
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        inventoryData[doc.id] = {
+          name: data.name,
+          quantity: data.quantity,
+          category: data.category
+        };
+        categoriesSet.add(data.category);
+      });
+      setInventory(inventoryData);
+      setCategories(Array.from(categoriesSet).sort());
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     updateInventory();
-  }, []);
+  }, [updateInventory]);
 
-  const handleAddItem = async () => {
-    if (itemName && itemQuantity && itemCategory) {
-      const quantity = Math.max(0, parseInt(itemQuantity, 10) || 0);
-      await addItem({ name: itemName.trim(), quantity, category: itemCategory });
-      await updateInventory();
-      handleClose();
-    }
-  };
-
-  const handleEditItem = async () => {
-    if (editingItem && itemName && itemQuantity && itemCategory) {
-      const quantity = Math.max(0, parseInt(itemQuantity, 10) || 0);
-      await updateItem(editingItem.name, { name: itemName.trim(), quantity, category: itemCategory });
-      await updateInventory();
-      handleClose();
-    }
-  };
-
-  const handleRemoveItem = async (name) => {
-    await removeItem(name);
-    await updateInventory();
-  };
-
-  const handleIncreaseQuantity = async (name, currentQuantity) => {
-    await updateItem(name, { name, quantity: currentQuantity + 1 });
-    await updateInventory();
-  };
-
-  const handleOpen = (item = null) => {
-    if (item) {
-      setEditingItem(item);
-      setItemName(item.name || '');
-      setItemQuantity(item.quantity ? item.quantity.toString() : '');
-      setItemCategory(item.category || '');
+  const handleOpen = (itemId = null) => {
+    if (itemId) {
+      const item = inventory[itemId];
+      setEditingItem(itemId);
+      setItemName(item.name);
+      setItemQuantity(item.quantity.toString());
+      setItemCategory(item.category);
     } else {
       setEditingItem(null);
       setItemName('');
@@ -107,9 +64,113 @@ export const useInventory = () => {
     setItemCategory('');
   };
 
-  const getUniqueCategories = () => {
-    const uniqueCategories = new Set(inventory.map(item => item.category));
-    return Array.from(uniqueCategories).sort();
+  const handleAddOrUpdateItem = async () => {
+    console.log("handleAddOrUpdateItem called");
+    console.log("itemName:", itemName);
+    console.log("itemQuantity:", itemQuantity);
+    console.log("itemCategory:", itemCategory);
+
+    if (itemName && itemQuantity && itemCategory) {
+      try {
+        const itemId = editingItem || itemName.trim().toLowerCase();
+        console.log("itemId:", itemId);
+
+        const newItem = {
+          name: itemName.trim(),
+          quantity: parseInt(itemQuantity, 10),
+          category: itemCategory.trim()
+        };
+        console.log("newItem:", newItem);
+
+        await setDoc(doc(firestore, 'inventory', itemId), newItem);
+        console.log("Item added/updated in Firestore");
+        
+        // Update local state
+        setInventory(prevInventory => {
+          const updatedInventory = {
+            ...prevInventory,
+            [itemId]: newItem
+          };
+          console.log("Updated inventory:", updatedInventory);
+          return updatedInventory;
+        });
+        
+        // Update categories if necessary
+        if (!categories.includes(newItem.category)) {
+          setCategories(prevCategories => {
+            const updatedCategories = [...prevCategories, newItem.category].sort();
+            console.log("Updated categories:", updatedCategories);
+            return updatedCategories;
+          });
+        }
+        
+        handleClose();
+        console.log("Dialog closed");
+      } catch (error) {
+        console.error("Error adding/updating item:", error);
+      }
+    } else {
+      console.log("Invalid input: some fields are empty");
+    }
+  };
+
+  const handleRemoveItem = async (itemId) => {
+    try {
+      await deleteDoc(doc(firestore, 'inventory', itemId));
+      
+      // Update local state
+      setInventory(prevInventory => {
+        const newInventory = { ...prevInventory };
+        delete newInventory[itemId];
+        return newInventory;
+      });
+      
+      // Update categories if necessary
+      const remainingCategories = new Set(Object.values(inventory).map(item => item.category));
+      setCategories(Array.from(remainingCategories).sort());
+    } catch (error) {
+      console.error("Error removing item:", error);
+    }
+  };
+
+  const handleIncreaseQuantity = async (itemId) => {
+    try {
+      const item = inventory[itemId];
+      const updatedQuantity = item.quantity + 1;
+      await setDoc(doc(firestore, 'inventory', itemId), { ...item, quantity: updatedQuantity });
+      
+      // Update local state
+      setInventory(prevInventory => ({
+        ...prevInventory,
+        [itemId]: { ...item, quantity: updatedQuantity }
+      }));
+    } catch (error) {
+      console.error("Error increasing quantity:", error);
+    }
+  };
+
+  const handleDecreaseQuantity = async (itemId) => {
+    try {
+      const item = inventory[itemId];
+      if (!item) {
+        console.error("Item not found:", itemId);
+        return;
+      }
+      const updatedQuantity = Math.max(0, item.quantity - 1);
+      
+      // Update Firestore
+      await setDoc(doc(firestore, 'inventory', itemId), { ...item, quantity: updatedQuantity });
+      
+      // Update local state
+      setInventory(prevInventory => ({
+        ...prevInventory,
+        [itemId]: { ...item, quantity: updatedQuantity }
+      }));
+
+      console.log(`Decreased quantity for ${itemId}. New quantity: ${updatedQuantity}`);
+    } catch (error) {
+      console.error("Error decreasing quantity:", error);
+    }
   };
 
   return {
@@ -120,16 +181,16 @@ export const useInventory = () => {
     itemQuantity,
     itemCategory,
     editingItem,
-    categories: getUniqueCategories(),
+    categories,
     handleOpen,
     handleClose,
-    handleAddItem,
-    handleEditItem,
+    handleAddOrUpdateItem,
     handleRemoveItem,
     handleIncreaseQuantity,
+    handleDecreaseQuantity,
     setItemName,
     setItemQuantity,
     setItemCategory,
     updateInventory,
   };
-};
+}

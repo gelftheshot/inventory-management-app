@@ -20,14 +20,14 @@ const Dashboard = () => {
     categories,
     handleOpen,
     handleClose,
-    handleAddItem,
-    handleEditItem,
+    handleAddOrUpdateItem,
     handleRemoveItem,
     handleIncreaseQuantity,
+    handleDecreaseQuantity,
     setItemName,
     setItemQuantity,
     setItemCategory,
-    updateInventory
+    updateInventory,
   } = useInventory();
 
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -58,6 +58,7 @@ const Dashboard = () => {
                   inventory={filteredInventory}
                   loading={loading}
                   handleIncreaseQuantity={handleIncreaseQuantity}
+                  handleDecreaseQuantity={handleDecreaseQuantity}
                   handleOpen={handleOpen}
                   handleRemoveItem={handleRemoveItem}
                 />
@@ -73,8 +74,7 @@ const Dashboard = () => {
           itemCategory={itemCategory}
           categories={categories}
           handleClose={handleClose}
-          handleAddItem={handleAddItem}
-          handleEditItem={handleEditItem}
+          handleAddOrUpdateItem={handleAddOrUpdateItem}
           setItemName={setItemName}
           setItemQuantity={setItemQuantity}
           setItemCategory={setItemCategory}

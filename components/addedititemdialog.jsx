@@ -6,71 +6,68 @@ import {
   DialogActions,
   TextField,
   Button,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
 } from '@mui/material';
 
-const AddEditItemDialog = ({
+export default function AddEditItemDialog({
   open,
   editingItem,
   itemName,
   itemQuantity,
   itemCategory,
   handleClose,
-  handleAddItem,
-  handleEditItem,
+  handleAddOrUpdateItem,
   setItemName,
   setItemQuantity,
   setItemCategory,
-  categories,
-}) => {
+}) {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Submit button clicked");
+    handleAddOrUpdateItem();
+  };
+
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>{editingItem ? 'Edit Item' : 'Add New Item'}</DialogTitle>
-      <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          label="Item Name"
-          type="text"
-          fullWidth
-          value={itemName}
-          onChange={(e) => setItemName(e.target.value)}
-        />
-        <TextField
-          margin="dense"
-          label="Quantity"
-          type="number"
-          fullWidth
-          value={itemQuantity}
-          onChange={(e) => setItemQuantity(e.target.value)}
-        />
-        <FormControl fullWidth margin="dense">
-          <InputLabel id="category-select-label">Category</InputLabel>
-          <Select
-            labelId="category-select-label"
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>{editingItem ? 'Edit Item' : 'Add New Item'}</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Item Name"
+            type="text"
+            fullWidth
+            value={itemName}
+            onChange={(e) => setItemName(e.target.value)}
+            disabled={!!editingItem}
+            required
+          />
+          <TextField
+            margin="dense"
+            label="Quantity"
+            type="number"
+            fullWidth
+            value={itemQuantity}
+            onChange={(e) => setItemQuantity(e.target.value)}
+            required
+          />
+          <TextField
+            margin="dense"
+            label="Category"
+            type="text"
+            fullWidth
             value={itemCategory}
             onChange={(e) => setItemCategory(e.target.value)}
-            label="Category"
-          >
-            {categories.map((category) => (
-              <MenuItem key={category} value={category}>
-                {category}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={editingItem ? handleEditItem : handleAddItem} color="primary">
-          {editingItem ? 'Update' : 'Add'}
-        </Button>
-      </DialogActions>
+            required
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button type="submit" color="primary">
+            {editingItem ? 'Update' : 'Add'}
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
-};
-
-export default AddEditItemDialog;
+}

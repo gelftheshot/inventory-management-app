@@ -86,5 +86,6 @@ export const useInventory = () => {
     handleIncreaseQuantity,
     setItemName,
     setItemQuantity,
+    updateInventory,
   };
 };

@@ -6,16 +6,18 @@ import {
   setDoc,
   deleteDoc,
   updateDoc,
+  query,
+  where,
 } from 'firebase/firestore'
 
-export const addItem = async (item) => {
-  const docRef = doc(collection(firestore, 'inventory'), item.name.toLowerCase())
+export const addItem = async ({ name, quantity, category }) => {
+  const docRef = doc(collection(firestore, 'inventory'), name.toLowerCase())
   const docSnap = await getDoc(docRef)
   if (docSnap.exists()) {
-    const { quantity } = docSnap.data()
-    await updateDoc(docRef, { quantity: quantity + item.quantity })
+    const { quantity: currentQuantity } = docSnap.data()
+    await updateDoc(docRef, { quantity: currentQuantity + quantity, category })
   } else {
-    await setDoc(docRef, { name: item.name, quantity: item.quantity })
+    await setDoc(docRef, { name, quantity, category })
   }
 }
 
@@ -26,10 +28,10 @@ export const updateItem = async (oldName, newItem) => {
   if (oldName.toLowerCase() !== newItem.name.toLowerCase()) {
     // If the name has changed, delete the old document and create a new one
     await deleteDoc(oldDocRef)
-    await setDoc(newDocRef, { name: newItem.name, quantity: newItem.quantity })
+    await setDoc(newDocRef, { name: newItem.name, quantity: newItem.quantity, category: newItem.category })
   } else {
     // If only the quantity has changed, update the existing document
-    await updateDoc(oldDocRef, { quantity: newItem.quantity })
+    await updateDoc(oldDocRef, { quantity: newItem.quantity, category: newItem.category })
   }
 }
 

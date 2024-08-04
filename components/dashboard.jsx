@@ -15,7 +15,9 @@ const Dashboard = () => {
     open,
     itemName,
     itemQuantity,
+    itemCategory,
     editingItem,
+    categories,
     handleOpen,
     handleClose,
     handleAddItem,
@@ -24,6 +26,7 @@ const Dashboard = () => {
     handleIncreaseQuantity,
     setItemName,
     setItemQuantity,
+    setItemCategory,
     updateInventory
   } = useInventory();
 
@@ -48,11 +51,14 @@ const Dashboard = () => {
         editingItem={editingItem}
         itemName={itemName}
         itemQuantity={itemQuantity}
+        itemCategory={itemCategory}
+        categories={categories}
         handleClose={handleClose}
         handleAddItem={handleAddItem}
         handleEditItem={handleEditItem}
         setItemName={setItemName}
         setItemQuantity={setItemQuantity}
+        setItemCategory={setItemCategory}
       />
     </Box>
   );

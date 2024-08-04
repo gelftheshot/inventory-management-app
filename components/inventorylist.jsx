@@ -7,7 +7,8 @@ import {
   IconButton,
   Divider,
   Box,
-  CircularProgress,
+  CircularProgress, 
+  Typography
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -17,9 +18,9 @@ const InventoryList = ({
   inventory,
   loading,
   handleIncreaseQuantity,
+  handleDecreaseQuantity,
   handleOpen,
   handleRemoveItem,
-  updateInventory,
 }) => {
   if (loading) {
     return (
@@ -35,22 +36,22 @@ const InventoryList = ({
 
   return (
     <List sx={{ width: '100%' }}>
-      {inventory.map(({ id, name, quantity, category }) => (
-        <React.Fragment key={id}>
+      {inventory.map((item) => (
+        <React.Fragment key={item.id}>
           <ListItem>
             <ListItemText
-              primary={name ? name.charAt(0).toUpperCase() + name.slice(1) : 'Unnamed Item'}
-              secondary={`Quantity: ${quantity || 0} | Category: ${category}`}
+              primary={item.name ? item.name.charAt(0).toUpperCase() + item.name.slice(1) : 'Unnamed Item'}
+              secondary={`Quantity: ${item.quantity || 0} | Category: ${item.category}`}
             />
             <ListItemSecondaryAction>
-              <IconButton edge="end" aria-label="increase" onClick={() => handleIncreaseQuantity({ name, quantity, category })}>
+              <IconButton edge="end" aria-label="increase" onClick={() => handleIncreaseQuantity(item)}>
                 <AddIcon />
               </IconButton>
-              <IconButton edge="end" aria-label="edit" onClick={() => handleOpen({ id, name, quantity, category })}>
-                <EditIcon />
-              </IconButton>
-              <IconButton edge="end" aria-label="remove" onClick={() => handleRemoveItem(name)}>
+              <IconButton edge="end" aria-label="decrease" onClick={() => handleDecreaseQuantity(item)}>
                 <RemoveIcon />
+              </IconButton>
+              <IconButton edge="end" aria-label="edit" onClick={() => handleOpen(item)}>
+                <EditIcon />
               </IconButton>
             </ListItemSecondaryAction>
           </ListItem>

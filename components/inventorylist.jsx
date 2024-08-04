@@ -19,6 +19,7 @@ const InventoryList = ({
   handleIncreaseQuantity,
   handleOpen,
   handleRemoveItem,
+  updateInventory,
 }) => {
   if (loading) {
     return (
@@ -30,18 +31,18 @@ const InventoryList = ({
 
   return (
     <List sx={{ width: '100%' }}>
-      {inventory.map(({ id, name, quantity }) => (
+      {inventory.map(({ id, name, quantity, category }) => (
         <React.Fragment key={id}>
           <ListItem>
             <ListItemText
               primary={name ? name.charAt(0).toUpperCase() + name.slice(1) : 'Unnamed Item'}
-              secondary={`Quantity: ${quantity || 0}`}
+              secondary={`Quantity: ${quantity || 0} | Category: ${category}`}
             />
             <ListItemSecondaryAction>
-              <IconButton edge="end" aria-label="increase" onClick={() => handleIncreaseQuantity(name, quantity)}>
+              <IconButton edge="end" aria-label="increase" onClick={() => handleIncreaseQuantity({ name, quantity, category })}>
                 <AddIcon />
               </IconButton>
-              <IconButton edge="end" aria-label="edit" onClick={() => handleOpen({ id, name, quantity })}>
+              <IconButton edge="end" aria-label="edit" onClick={() => handleOpen({ id, name, quantity, category })}>
                 <EditIcon />
               </IconButton>
               <IconButton edge="end" aria-label="remove" onClick={() => handleRemoveItem(name)}>

@@ -27,9 +27,10 @@ export default function UploadPhotoButton({ updateInventory }) {
 
       const data = await response.json();
       console.log('Identified item:', data.itemName);
+      console.log('Category:', data.category);
       
-      // Add the identified item to the inventory
-      await addItem({ name: data.itemName, quantity: 1 });
+      // Add the identified item to the inventory with its category
+      await addItem({ name: data.itemName, quantity: 1, category: data.category });
 
       // Refresh the inventory list
       await updateInventory();

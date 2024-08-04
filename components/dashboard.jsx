@@ -24,6 +24,7 @@ const Dashboard = () => {
     handleIncreaseQuantity,
     setItemName,
     setItemQuantity,
+    updateInventory
   } = useInventory();
 
   return (
@@ -33,7 +34,7 @@ const Dashboard = () => {
       </Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3 }}>
         <AddItemButton handleOpen={handleOpen} />
-        <UploadPhotoButton />
+        <UploadPhotoButton updateInventory={updateInventory} />
       </Box>
       <InventoryList
         inventory={inventory}

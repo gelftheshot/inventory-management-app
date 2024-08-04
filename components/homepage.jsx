@@ -2,18 +2,19 @@
 import {Stack} from '@mui/material'
 import Dashboard from './dashboard'
 import Sidebar from './sidebar'
-import { Box } from '@mui/material'
+import { Box, Toolbar } from '@mui/material'
 import Header from './header'
 
 const Homepage = () => (
-  <Box>
+  <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
     <Header />
-    <Stack direction='row' spacing={2}>
-      <Box style={{ backgroundColor: '#f0f0f0', width: '350px' }}>
-        <Sidebar />
+    <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
+      <Sidebar />
+      <Box component="main" sx={{ flexGrow: 1, p: 3, overflow: 'auto' }}>
+        <Toolbar />
+        <Dashboard />
       </Box>
-      <Dashboard />
-    </Stack>
+    </Box>
   </Box>
 )
 

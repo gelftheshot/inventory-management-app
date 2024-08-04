@@ -6,6 +6,10 @@ import {
   DialogActions,
   TextField,
   Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
 } from '@mui/material';
 
 const AddEditItemDialog = ({
@@ -13,11 +17,14 @@ const AddEditItemDialog = ({
   editingItem,
   itemName,
   itemQuantity,
+  itemCategory,
   handleClose,
   handleAddItem,
   handleEditItem,
   setItemName,
   setItemQuantity,
+  setItemCategory,
+  categories,
 }) => {
   return (
     <Dialog open={open} onClose={handleClose}>
@@ -40,6 +47,21 @@ const AddEditItemDialog = ({
           value={itemQuantity}
           onChange={(e) => setItemQuantity(e.target.value)}
         />
+        <FormControl fullWidth margin="dense">
+          <InputLabel id="category-select-label">Category</InputLabel>
+          <Select
+            labelId="category-select-label"
+            value={itemCategory}
+            onChange={(e) => setItemCategory(e.target.value)}
+            label="Category"
+          >
+            {categories.map((category) => (
+              <MenuItem key={category} value={category}>
+                {category}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>

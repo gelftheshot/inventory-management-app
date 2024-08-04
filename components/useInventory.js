@@ -8,8 +8,41 @@ export const useInventory = () => {
   const [open, setOpen] = useState(false);
   const [itemName, setItemName] = useState('');
   const [itemQuantity, setItemQuantity] = useState('');
+  const [itemCategory, setItemCategory] = useState('');
   const [editingItem, setEditingItem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([
+    'Electronics',
+    'Clothing',
+    'Food',
+    'Beverages',
+    'Furniture',
+    'Kitchen Appliances',
+    'Home Decor',
+    'Books',
+    'Toys',
+    'Sports Equipment',
+    'Tools',
+    'Gardening',
+    'Automotive',
+    'Health and Beauty',
+    'Cleaning Supplies',
+    'Office Supplies',
+    'Pet Supplies',
+    'Jewelry',
+    'Art Supplies',
+    'Music Instruments',
+    'Outdoor Equipment',
+    'Luggage',
+    'Crafts',
+    'Baby Items',
+    'Medications',
+    'Party Supplies',
+    'Seasonal Decorations',
+    'Stationery',
+    'Collectibles',
+    'Other'
+  ]);
 
   const updateInventory = async () => {
     setLoading(true);
@@ -24,18 +57,18 @@ export const useInventory = () => {
   }, []);
 
   const handleAddItem = async () => {
-    if (itemName && itemQuantity) {
+    if (itemName && itemQuantity && itemCategory) {
       const quantity = Math.max(0, parseInt(itemQuantity, 10) || 0);
-      await addItem({ name: itemName.trim(), quantity });
+      await addItem({ name: itemName.trim(), quantity, category: itemCategory });
       await updateInventory();
       handleClose();
     }
   };
 
   const handleEditItem = async () => {
-    if (editingItem && itemName && itemQuantity) {
+    if (editingItem && itemName && itemQuantity && itemCategory) {
       const quantity = Math.max(0, parseInt(itemQuantity, 10) || 0);
-      await updateItem(editingItem.name, { name: itemName.trim(), quantity });
+      await updateItem(editingItem.name, { name: itemName.trim(), quantity, category: itemCategory });
       await updateInventory();
       handleClose();
     }
@@ -56,10 +89,12 @@ export const useInventory = () => {
       setEditingItem(item);
       setItemName(item.name || '');
       setItemQuantity(item.quantity ? item.quantity.toString() : '');
+      setItemCategory(item.category || '');
     } else {
       setEditingItem(null);
       setItemName('');
       setItemQuantity('');
+      setItemCategory('');
     }
     setOpen(true);
   };
@@ -69,6 +104,12 @@ export const useInventory = () => {
     setEditingItem(null);
     setItemName('');
     setItemQuantity('');
+    setItemCategory('');
+  };
+
+  const getUniqueCategories = () => {
+    const uniqueCategories = new Set(inventory.map(item => item.category));
+    return Array.from(uniqueCategories).sort();
   };
 
   return {
@@ -77,7 +118,9 @@ export const useInventory = () => {
     open,
     itemName,
     itemQuantity,
+    itemCategory,
     editingItem,
+    categories: getUniqueCategories(),
     handleOpen,
     handleClose,
     handleAddItem,
@@ -86,6 +129,7 @@ export const useInventory = () => {
     handleIncreaseQuantity,
     setItemName,
     setItemQuantity,
+    setItemCategory,
     updateInventory,
   };
 };

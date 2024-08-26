@@ -1,8 +1,17 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 ##about the project
+# Inventory Management App
 
-this is an inventory management application. basically, you can take a photo and get the name of the photo
-the category of the photo and different information about the photo and save to correct inventory part.
+This is an inventory management application built with Next.js and Firebase. It allows users to take photos of items, automatically categorize them, and save them to the correct inventory section.
+
+## About the Project
+
+The Inventory Management App provides a simple and efficient way to manage inventory. Key features include:
+
+- Photo-based item entry
+- Automatic item name and category detection
+- Detailed information storage for each item
+- Integration with Firebase for data management
 ## Getting Started
 
 First, run the development server:

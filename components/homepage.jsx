@@ -12,14 +12,14 @@ const Homepage = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <Header />
-      <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
-        <Box sx={{ width: 350, flexShrink: 0, overflow: 'auto', borderRight: 1, borderColor: 'divider' }}>
+      <Box sx={{ display: 'flex', flexGrow: 1, mt: '64px' }}>
+        <Box sx={{ width: 350, flexShrink: 0, borderRight: 1, borderColor: 'divider' }}>
           <Sidebar 
             selectedCategory={selectedCategory} 
             setSelectedCategory={setSelectedCategory} 
           />
         </Box>
-        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+        <Box sx={{ flexGrow: 1, overflow: 'auto', p: 3 }}>
           <Dashboard selectedCategory={selectedCategory} />
         </Box>
       </Box>

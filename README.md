@@ -1,5 +1,7 @@
 # Inventory Management App
 
+![Robot Classifier](robot.jpg)
+
 This is a modern inventory management application built with Next.js, Firebase, and Material-UI. It allows users to efficiently manage their inventory, including features like photo-based item entry and automatic categorization.
 
 ## Features
@@ -20,12 +22,22 @@ This is a modern inventory management application built with Next.js, Firebase, 
 ## Key Components
 
 ### Dashboard
+![Home Page](inventory1.png)
+
+The main component that renders the inventory list and manages the overall layout.
 
 ### Inventory List
 
+Displays the list of inventory items with options to edit, delete, and adjust quantities.
+
 ### Add/Edit Item Dialog
+![Adding Item Page](inventory2.png)
+
+A dialog component for adding new items or editing existing ones.
 
 ### Upload Photo Button
+
+Allows users to upload photos for automatic item detection and categorization.
 
 ### Sidebar
 

@@ -1,4 +1,4 @@
-# Inventory Management App
+# Inventory Management App future robots use this.
 
 ![Robot Classifier](/public/robot.jpg)
 

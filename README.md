@@ -1,19 +1,24 @@
 # Inventory Management
 
-An inventory application with item records, categories, quantity controls, and photo-based item entry.
+An inventory app I built with Next.js 14 and Material UI, mostly in August 2024. Items can be typed in by hand, or you can upload a photo and let Gemini name the item and pick its category.
 
 ![Inventory dashboard](./public/inventory1.png)
 
-## What it does
+## Adding an item from a photo
 
-- Add, edit, and remove inventory items.
-- Adjust item quantities and organize items into categories.
-- Upload a photo for item identification and categorization.
-- Store inventory data in Firestore.
+The upload button posts the image to `app/api/sendphoto/route.js`. That route sends it to `gemini-1.5-pro-latest` along with the 104 category names in `utils/categories.js` and asks for a two-line answer, `Item:` and `Category:`.
 
-## Run locally
+`addItem` in `utils/itemController.js` then looks for an item with the same name in the Firestore `inventory` collection. If one exists its quantity goes up by one; if not, a new item is created with a quantity of 1.
 
-You need Node.js, npm, a Firebase/Firestore project, and a Google Generative AI API key for the photo-analysis route.
+The route reads the model's answer by line position, so it only works when Gemini replies in exactly that format. When a photo fails, the error goes to the browser console and the page shows no message.
+
+![Add an inventory item](./public/inventory2.png)
+
+## Manual entry
+
+The add and edit dialog writes straight to the same `inventory` collection. The plus and minus buttons change a quantity by one, and minus stops at zero (`components/useInventory.js`).
+
+## Local setup
 
 ```bash
 git clone https://github.com/gelftheshot/inventory-management-app.git
@@ -21,38 +26,17 @@ cd inventory-management-app
 npm ci
 ```
 
-Create `.env.local` in the project root:
+The code reads these two names from `.env.local`:
 
 ```dotenv
 FIREBASE_API_KEY=your_firebase_web_api_key
 GEMINI_API_KEY=your_google_api_key
 ```
 
-These variable names match the current source. Update the project-specific Firebase web-app settings in `app/firebase.js` for your own Firebase project, and verify that the browser receives the configuration required by the client application. Configure Firestore access for that project.
+`app/firebase.js` takes the Firebase key from `FIREBASE_API_KEY`, which has no `NEXT_PUBLIC_` prefix, while the inventory list talks to Firestore from the browser. Check that the key actually reaches the browser in your setup. The other Firebase values in that file belong to my project, so replace them with your own.
 
-```bash
-npm run dev
-```
+Run `npm run dev` and visit http://localhost:3000. A production build is `npm run build`, then `npm start`.
 
-Open [http://localhost:3000](http://localhost:3000).
+To use a different Gemini model for photos, edit the model name in `app/api/sendphoto/route.js`.
 
-For a production build:
-
-```bash
-npm run build
-npm start
-```
-
-The photo-analysis route uses the provider model configured in `app/api/sendphoto/route.js`. Verify provider access and current model availability when setting up your own environment.
-
-## Item entry
-
-![Add an inventory item](./public/inventory2.png)
-
-## Main files
-
-- `app/page.js`: inventory interface and item interactions.
-- `app/firebase.js`: Firebase/Firestore configuration.
-- `app/api/sendphoto/route.js`: photo-based item identification and categorization.
-
-[Project write-up](https://www.lihongebre.com/projects/inventory-management)
+Full write-up: [Inventory Management project page](https://www.lihongebre.com/projects/inventory-management)

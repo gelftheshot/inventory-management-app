@@ -1,64 +1,58 @@
-# Inventory Management App future robots use this.
+# Inventory Management
 
-![Robot Classifier](/public/robot.jpg)
+An inventory application with item records, categories, quantity controls, and photo-based item entry.
 
-This is a modern inventory management application built with Next.js, Firebase, and Material-UI. It allows users to efficiently manage their inventory, including features like photo-based item entry and automatic categorization.
+![Inventory dashboard](./public/inventory1.png)
 
-## Features
+## What it does
 
-- Photo-based item entry with automatic categorization
-- Real-time inventory management
-- Category-based item organization
-- Intuitive user interface with Material-UI components
-- Firebase integration for data storage and retrieval
+- Add, edit, and remove inventory items.
+- Adjust item quantities and organize items into categories.
+- Upload a photo for item identification and categorization.
+- Store inventory data in Firestore.
 
-## Tech Stack
+## Run locally
 
-- Frontend: Next.js, React
-- UI Library: Material-UI
-- Backend: Firebase (Firestore)
-- Image Analysis: Google's Generative AI (Gemini)
+You need Node.js, npm, a Firebase/Firestore project, and a Google Generative AI API key for the photo-analysis route.
 
-## Key Components
+```bash
+git clone https://github.com/gelftheshot/inventory-management-app.git
+cd inventory-management-app
+npm ci
+```
 
-### Dashboard
-![Home Page](/public/inventory1.png)
+Create `.env.local` in the project root:
 
-The main component that renders the inventory list and manages the overall layout.
+```dotenv
+FIREBASE_API_KEY=your_firebase_web_api_key
+GEMINI_API_KEY=your_google_api_key
+```
 
-### Inventory List
+These variable names match the current source. Update the project-specific Firebase web-app settings in `app/firebase.js` for your own Firebase project, and verify that the browser receives the configuration required by the client application. Configure Firestore access for that project.
 
-Displays the list of inventory items with options to edit, delete, and adjust quantities.
+```bash
+npm run dev
+```
 
-### Add/Edit Item Dialog
-![Adding Item Page](/public/inventory2.png)
+Open [http://localhost:3000](http://localhost:3000).
 
-A dialog component for adding new items or editing existing ones.
+For a production build:
 
-### Upload Photo Button
+```bash
+npm run build
+npm start
+```
 
-Allows users to upload photos for automatic item detection and categorization.
+The photo-analysis route uses the provider model configured in `app/api/sendphoto/route.js`. Verify provider access and current model availability when setting up your own environment.
 
-### Sidebar
+## Item entry
 
-## API Integration
+![Add an inventory item](./public/inventory2.png)
 
-The app uses Google's Generative AI (Gemini) for image analysis:
+## Main files
 
-## Getting Started
+- `app/page.js`: inventory interface and item interactions.
+- `app/firebase.js`: Firebase/Firestore configuration.
+- `app/api/sendphoto/route.js`: photo-based item identification and categorization.
 
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Set up a Firebase project and update the configuration in `app/firebase.js`
-4. Set up a Google Cloud project and obtain an API key for the Gemini API
-5. Create a `.env.local` file and add your Firebase and Gemini API keys
-6. Run the development server: `npm run dev`
-7. Open [http://localhost:3000](http://localhost:3000) in your browser
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License.
+[Project write-up](https://www.lihongebre.com/projects/inventory-management)
